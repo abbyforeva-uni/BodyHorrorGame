@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public enum CombatState { Setup, PlayerTurn, Resolving, EnemyTurn, Victory, Defeat }
 
@@ -13,10 +12,16 @@ public class CombatManager : MonoBehaviour
     public Button endTurnButton;
     public RectTransform playZone;
     public FloatingNumber floatingNumberPrefab;
-    public Transform worldCanvas;              // floating numbers parent
-    public Transform enemyTransform;           // where enemy numbers appear
-    public Transform playerAvatarTransform;    // where player numbers appear
+    public Transform numberParent;
+    public Transform enemyTransform;
+    public Transform playerAvatarTransform;
     public TMP_Text stateLabel;
+
+    [Header("HP Display")]
+    public TMP_Text playerHpText;
+    public TMP_Text enemyHpText;
+    public Image playerHpBar;
+    public Image enemyHpBar;
 
     [Header("Enemy (stub)")]
     public int enemyHP = 40;
@@ -32,6 +37,7 @@ public class CombatManager : MonoBehaviour
     void Start()
     {
         endTurnButton.onClick.AddListener(OnEndTurnPressed);
+        UpdateHpDisplay();
         StartCoroutine(SetupRoutine());
     }
 
@@ -67,14 +73,15 @@ public class CombatManager : MonoBehaviour
         var selected = playerHand.GetSelectedCards();
         foreach (var card in selected)
         {
-            // Stub resolution — number only, no systems yet
-            Color c = card.data.valueColor;
-            Vector3 pos = card.data.cardType == CardType.Attack ? enemyTransform.position : playerAvatarTransform.position;
-            SpawnNumber(card.data.value.ToString(), c, pos);
+            Vector3 pos = card.data.cardType == CardType.Attack
+                ? enemyTransform.position
+                : playerAvatarTransform.position;
+            SpawnNumber(card.data.value.ToString(), card.data.valueColor, pos);
             yield return new WaitForSeconds(0.15f);
         }
 
         playerHand.DiscardAllSelected();
+        UpdateHpDisplay();
         yield return new WaitForSeconds(0.5f);
 
         if (enemyHP <= 0) { SetState(CombatState.Victory); yield break; }
@@ -90,16 +97,24 @@ public class CombatManager : MonoBehaviour
     {
         SetState(CombatState.EnemyTurn);
         yield return new WaitForSeconds(0.3f);
-        // Stub: enemy attacks player
         SpawnNumber(enemyAttackDamage.ToString(), Color.red, playerAvatarTransform.position);
         playerHP -= enemyAttackDamage;
+        UpdateHpDisplay();
         yield return new WaitForSeconds(0.8f);
     }
 
     void SpawnNumber(string text, Color color, Vector3 worldPos)
     {
-        var fn = Instantiate(floatingNumberPrefab, worldCanvas);
+        var fn = Instantiate(floatingNumberPrefab, numberParent);
         fn.Show(text, color, worldPos);
+    }
+
+    void UpdateHpDisplay()
+    {
+        if (playerHpText) playerHpText.text = $"{playerHP} / {playerMaxHP}";
+        if (enemyHpText) enemyHpText.text = $"{enemyHP} / {enemyMaxHP}";
+        if (playerHpBar) playerHpBar.fillAmount = (float)playerHP / playerMaxHP;
+        if (enemyHpBar) enemyHpBar.fillAmount = (float)enemyHP / enemyMaxHP;
     }
 
     void SetState(CombatState s)

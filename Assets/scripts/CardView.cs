@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿    using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
@@ -43,14 +43,6 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         if (cardData.cardArt) artImage.sprite = cardData.cardArt;
         if (cardData.cardFrame) frameImage.sprite = cardData.cardFrame;
     }
-
-    public void SetHome(Transform parent)
-    {
-        homeParent = parent;
-        rect.SetParent(parent, false);
-        homeAnchoredPos = rect.anchoredPosition;
-    }
-
     public void ToggleSelect()
     {
         selected = !selected;
@@ -83,17 +75,30 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         rect.position = e.position;
     }
 
+    public void SetHome(Transform parent)
+    {
+        homeParent = parent;
+        rect.SetParent(parent, false);
+    }
+
     public void OnEndDrag(PointerEventData e)
     {
         canvasGroup.blocksRaycasts = true;
         transform.SetParent(homeParent, false);
-        rect.anchoredPosition = homeAnchoredPos;
         transform.localScale = selected ? homeScale * dragScale : homeScale;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(homeParent as RectTransform);
 
         if (DragDropManager.Instance != null && DragDropManager.Instance.playZoneRect != null
-            && RectTransformUtility.RectangleContainsScreenPoint(DragDropManager.Instance.playZoneRect, e.position, e.pressEventCamera))
+            && RectTransformUtility.RectangleContainsScreenPoint(
+                DragDropManager.Instance.playZoneRect, e.position, e.pressEventCamera))
         {
-            DragDropManager.Instance.MarkForPlay(this);
+            if (!selected) ToggleSelect();  // ← only select, never deselect
         }
+        bool overPlayzone = DragDropManager.Instance != null
+    && DragDropManager.Instance.playZoneRect != null
+    && RectTransformUtility.RectangleContainsScreenPoint(
+        DragDropManager.Instance.playZoneRect, e.position, e.pressEventCamera);
+        Debug.Log($"Dropped. overPlayzone={overPlayzone}, selectedBefore={selected}");
     }
+
 }

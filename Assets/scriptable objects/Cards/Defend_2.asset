@@ -16,6 +16,6 @@ MonoBehaviour:
   cardType: 1
   value: 0
   valueColor: {r: 0.25490198, g: 0.4117647, b: 0.88235295, a: 1}
-  cardArt: {fileID: 21300000, guid: 147f23dff15b708438b189c944b2b3ee, type: 3}
+  cardArt: {fileID: 21300000, guid: fc3ad4e16955e994da2ca091d6b50380, type: 3}
   cardFrame: {fileID: 21300000, guid: 845ff4cb64f4ac6439353232bb74dd8b, type: 3}
   description: Gain 2 block

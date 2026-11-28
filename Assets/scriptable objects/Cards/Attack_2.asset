@@ -16,6 +16,6 @@ MonoBehaviour:
   cardType: 0
   value: 0
   valueColor: {r: 0.6980392, g: 0.1333333, b: 0.1333333, a: 1}
-  cardArt: {fileID: 21300000, guid: 53b955cef3ff1b34fa23c1058fe31dcc, type: 3}
+  cardArt: {fileID: 21300000, guid: ee9f7b0cdd30ece43953f19d837fec69, type: 3}
   cardFrame: {fileID: 21300000, guid: 845ff4cb64f4ac6439353232bb74dd8b, type: 3}
   description: Deal 5 damage
